@@ -1285,11 +1285,19 @@ export class PreviewService {
     artworkType: ArtworkType,
     provider: MultiLocalProviderType,
   ) {
-    return (
-      this.onlineImages[artworkType][imageKey].offline[provider].findIndex(
-        (item) => item.imageUrl === imageUrl,
-      ) === -1
-    );
+      if (this.onlineImages[artworkType][imageKey]?.offline === undefined) {
+        this.loggerService.info(`image this.onlineImages[${artworkType}][${imageKey}].offline is undefined`);
+        return false;
+      }
+      else if (this.onlineImages[artworkType][imageKey]?.offline?.[provider] === undefined) {
+        this.loggerService.info(`image this.onlineImages[${artworkType}][${imageKey}].offline[${provider}] is undefined`);
+        return false;
+      }
+      else {
+        return (this.onlineImages[artworkType][imageKey].offline[provider].findIndex(
+          (item) => item.imageUrl === imageUrl,
+        ) === -1);
+      }
   }
 
   addUniqueLocalImage(
@@ -1531,6 +1539,8 @@ export class PreviewService {
             }),
             { invokeAlert: true, alertTimeout: 3000 },
           );
+
+          this.loggerService.error(e.stack);
         }
       }
     }
